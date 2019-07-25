@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.martian.dao.borrow.BorrowMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        reader_id AS readerId, book_id AS bookId, out_date AS outDate, back_date AS backDate, is_back AS isBack,is_renew AS isRenew
+    </sql>
+    <select id="searchBorrowVoPage" resultType="com.martian.vo.book.BorrowVo">
+        SELECT
+           br.*,t.name AS typeName,
+           b.book_name AS bookName, b.type_id AS typeId, b.author, b.translator, b.isbn,
+           b.book_price AS bookPrice, b.press, b.book_image AS bookImage
+        FROM
+           t_borrow br
+          LEFT JOIN t_book b ON br.book_id = b.id
+          LEFT JOIN t_book_type t ON b.type_id = t.id
+        WHERE
+            br.is_valid = 'Y'
+            <if test="borrowSearchDto.readerId!=null and borrowSearchDto.readerId!=''">
+                AND br.reader_id = #{borrowSearchDto.readerId}
+            </if>
+            <if test="borrowSearchDto.isBack!=null">
+                AND br.is_back = #{borrowSearchDto.isBack}
+            </if>
+        ORDER BY br.create_time DESC
+    </select>
+    <select id="searchBorrowRecordVoPage" resultType="com.martian.vo.book.BorrowRecordVo">
+        SELECT
+            r.name AS readerName,r.card_no,
+            br.*,t.name AS typeName,
+            b.book_name AS bookName, b.type_id AS typeId, b.author, b.translator, b.isbn,
+            b.book_price AS bookPrice, b.press, b.book_image AS bookImage
+        FROM
+            t_borrow br
+            LEFT JOIN t_reader r ON br.reader_id = r.id
+            LEFT JOIN t_book b ON br.book_id = b.id
+            LEFT JOIN t_book_type t ON b.type_id = t.id
+        WHERE
+            br.is_valid = 'Y'
+            <if test="borrowSearchDto.cardNo!=null and borrowSearchDto.cardNo!=''">
+                AND r.card_no = #{borrowSearchDto.cardNo}
+            </if>
+            <if test="borrowSearchDto.readerName!=null and borrowSearchDto.readerName!=''">
+                AND r.name LIKE CONCAT('%',#{borrowSearchDto.readerName},'%')
+            </if>
+            <if test="borrowSearchDto.readerId!=null and borrowSearchDto.readerId!=''">
+                AND br.reader_id = #{borrowSearchDto.readerId}
+            </if>
+            <if test="borrowSearchDto.isBack!=null">
+                AND br.is_back = #{borrowSearchDto.isBack}
+            </if>
+            ORDER BY br.create_time DESC
+    </select>
+</mapper>

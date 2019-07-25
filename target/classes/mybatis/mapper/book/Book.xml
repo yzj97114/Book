@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.martian.dao.book.BookMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        book_name AS bookName, type_id AS typeId, author, translator, isbn, book_price AS bookPrice, press, book_image AS bookImage
+    </sql>
+    <select id="searchBookVoPage" resultType="com.martian.vo.book.BookVo">
+        SELECT
+            b.*,t.name AS typeName,s.name AS shelfName
+        FROM
+            t_book b LEFT JOIN t_book_type t ON b.type_id = t.id
+            LEFT JOIN t_book_shelf s ON b.shelf_id = s.id
+        WHERE
+            b.is_valid = 'Y'
+            <if test="bookSearchDto.bookName!=null and bookSearchDto.bookName!=''">
+                AND b.book_name LIKE CONCAT('%',#{bookSearchDto.bookName},'%')
+            </if>
+            <if test="bookSearchDto.typeId!=null and bookSearchDto.typeId!=''">
+                AND b.type_id = #{bookSearchDto.typeId}
+            </if>
+            <if test="bookSearchDto.shelfId!=null and bookSearchDto.shelfId!=''">
+                AND b.shelf_id = #{bookSearchDto.shelfId}
+            </if>
+            <if test="bookSearchDto.author!=null and bookSearchDto.author!=''">
+                AND b.author LIKE CONCAT('%',#{bookSearchDto.author},'%')
+            </if>
+            <if test="bookSearchDto.translator!=null and bookSearchDto.translator!=''">
+                AND b.translator LIKE CONCAT('%',#{bookSearchDto.translator},'%')
+            </if>
+            <if test="bookSearchDto.isbn!=null and bookSearchDto.isbn!=''">
+                AND b.isbn LIKE CONCAT('%',#{bookSearchDto.isbn},'%')
+            </if>
+            <if test="bookSearchDto.press!=null and bookSearchDto.press!=''">
+                AND b.press LIKE CONCAT('%',#{bookSearchDto.press},'%')
+            </if>
+            <if test="bookSearchDto.isLend!=null">
+                AND b.is_lend = #{bookSearchDto.isLend}
+            </if>
+        ORDER BY b.create_time DESC
+    </select>
+
+</mapper>

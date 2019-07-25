@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.martian.dao.message.MessageMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id,
+		is_valid AS isValid,
+		create_by AS createBy,
+		create_time AS createTime,
+		update_by AS updateBy,
+		update_time AS updateTime,
+        title, content
+    </sql>
+	<select id="searchMessageVoPage" resultType="com.martian.vo.message.MessageVo">
+		SELECT
+			*
+		FROM
+		 	t_message
+		<where>
+			<if test="searchManageDto.title!=null and searchManageDto.title!=''">
+				AND title LIKE CONCAT('%',#{searchManageDto.title},'%')
+			</if>
+		</where>
+		ORDER BY create_time DESC
+	</select>
+
+</mapper>
